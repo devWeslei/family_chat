@@ -13,9 +13,12 @@ class Cadastro extends StatefulWidget {
 
 class _CadastroState extends State<Cadastro> {
   //Controladores
-  TextEditingController _controllerNome = TextEditingController(text: "Weslei tiago");
-  TextEditingController _controllerEmail = TextEditingController(text: "weslei.t@hotmail.com");
-  TextEditingController _controllerSenha = TextEditingController(text: "123456");
+  TextEditingController _controllerNome =
+      TextEditingController(text: "Weslei tiago");
+  TextEditingController _controllerEmail =
+      TextEditingController(text: "weslei.t@hotmail.com");
+  TextEditingController _controllerSenha =
+      TextEditingController(text: "123456");
   String _mensagemErro = "";
 
   _validarCampos() {
@@ -33,12 +36,10 @@ class _CadastroState extends State<Cadastro> {
 
           Usuario usuario = Usuario();
           usuario.nome = nome;
-          usuario.email= email;
+          usuario.email = email;
           usuario.senha = senha;
 
-
-          _cadastrarUsuario( usuario );
-
+          _cadastrarUsuario(usuario);
         } else {
           setState(() {
             _mensagemErro = "Preencha a senha! digite mais que 6 caracteres";
@@ -56,38 +57,36 @@ class _CadastroState extends State<Cadastro> {
     }
   }
 
-  _cadastrarUsuario(Usuario usuario ) {
+  _cadastrarUsuario(Usuario usuario) {
     FirebaseAuth auth = FirebaseAuth.instance;
 
-    auth.createUserWithEmailAndPassword(
-        email: usuario.email!,
-        password: usuario.senha!
-    ).then((firebaseUser) {
-
+    auth
+        .createUserWithEmailAndPassword(
+            email: usuario.email!, password: usuario.senha!)
+        .then((firebaseUser) {
       //salvar dados do usuário
       FirebaseFirestore db = FirebaseFirestore.instance;
 
-      db.collection("usuarios")
+      db
+          .collection("usuarios")
           .doc(firebaseUser.user?.uid)
           .set(usuario.toMap());
 
-      Navigator.pushNamedAndRemoveUntil(context, RouteGenerator.ROTA_HOME, (_) => false);
-
-    }).catchError((error){
+      Navigator.pushNamedAndRemoveUntil(
+          context, RouteGenerator.ROTA_HOME, (_) => false);
+    }).catchError((error) {
       print("erro app: " + error.toString());
       setState(() {
-        _mensagemErro = "Erro ao cadastrar usuário, verifique os campos e tente novamente!";
+        _mensagemErro =
+            "Erro ao cadastrar usuário, verifique os campos e tente novamente!";
       });
     });
-
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text("Cadastro")
-      ),
+      appBar: AppBar(title: Text("Cadastro")),
       body: Container(
         decoration: BoxDecoration(color: Color(0xffd38565)),
         padding: EdgeInsets.all(16),
