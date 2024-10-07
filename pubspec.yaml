@@ -10,12 +10,12 @@ dependencies:
   flutter:
     sdk: flutter
 
-  cupertino_icons: ^1.0.2
-  firebase_core: ^1.10.6
-  firebase_auth: ^3.3.4
-  firebase_storage: ^10.2.4
-  cloud_firestore: ^3.1.5
-  image_picker: ^0.8.4+4
+  cupertino_icons: ^1.0.8
+  firebase_core: ^3.6.0
+  firebase_auth: ^5.3.1
+  firebase_storage: ^12.3.2
+  cloud_firestore: ^5.4.4
+  image_picker: ^1.1.2
 
 dev_dependencies:
   flutter_test:
@@ -24,3 +24,8 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+
+  assets:
+    - assets/family-chat-logo.png
+    - assets/usuario.png
+    - assets/bg.png

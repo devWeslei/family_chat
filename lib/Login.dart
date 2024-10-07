@@ -13,10 +13,8 @@ class Login extends StatefulWidget {
 }
 
 class _LoginState extends State<Login> {
-  TextEditingController _controllerEmail =
-      TextEditingController(text: "weslei.t@hotmail.com");
-  TextEditingController _controllerSenha =
-      TextEditingController(text: "123456");
+  TextEditingController _controllerEmail = TextEditingController();
+  TextEditingController _controllerSenha = TextEditingController();
   String _mensagemErro = "";
 
   _validarCampos() {
@@ -98,7 +96,7 @@ class _LoginState extends State<Login> {
                 Padding(
                   padding: EdgeInsets.only(bottom: 32),
                   child: Image.asset(
-                    "imagens/family-chat-logo.png",
+                    "assets/family-chat-logo.png",
                     width: 200,
                     height: 150,
                   ),

@@ -12,7 +12,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'dart:io';
 
 class Mensagens extends StatefulWidget {
-   final Usuario contato;
+  final Usuario contato;
   Mensagens(this.contato);
 
   @override
@@ -30,7 +30,6 @@ class _MensagensState extends State<Mensagens> {
   ScrollController _scrollController = ScrollController();
 
   final _controller = StreamController<QuerySnapshot>.broadcast();
-
 
   _enviarMensagem() {
     String? textoMensagem = _controllerMensagem.text;
@@ -152,13 +151,12 @@ class _MensagensState extends State<Mensagens> {
 
     dynamic user = snapshot.data();
 
-
-     _idUsuarioLogado = usuarioLogado.uid;
-     _idUsuarioDestinatario = widget.contato.idUsuario!;
+    _idUsuarioLogado = usuarioLogado.uid;
+    _idUsuarioDestinatario = widget.contato.idUsuario!;
 
     _adicionarListenerMensagens();
 
-    setState((){
+    setState(() {
       _idUsuarioLogado = usuarioLogado.uid;
       _idUsuarioDestinatario = widget.contato.idUsuario!;
       _usuarioLogado.nome = user["nome"];
@@ -167,28 +165,27 @@ class _MensagensState extends State<Mensagens> {
     });
   }
 
-  Stream<QuerySnapshot>? _adicionarListenerMensagens(){
-
-    final stream = db.collection("mensagens")
+  Stream<QuerySnapshot>? _adicionarListenerMensagens() {
+    final stream = db
+        .collection("mensagens")
         .doc(_idUsuarioLogado)
         .collection(widget.contato.idUsuario!)
-    .orderBy("data" , descending: false) // descendente: ( de A a Z e de 0 a 9)
+        .orderBy("data",
+            descending: false) // descendente: ( de A a Z e de 0 a 9)
         .snapshots();
 
     stream.listen((dados) {
-      _controller.add( dados );
-      Timer(Duration(seconds: 1), (){
+      _controller.add(dados);
+      Timer(Duration(seconds: 1), () {
         _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
       });
     });
     return null;
-
   }
 
-
   @override
-  void initState(){
-     super.initState();
+  void initState() {
+    super.initState();
     _recuperarDadosUsuario();
   }
 
@@ -225,19 +222,19 @@ class _MensagensState extends State<Mensagens> {
             ),
           ),
           Platform.isIOS
-          ? CupertinoButton(
-              child: Text("Enviar"),
-              onPressed: _enviarMensagem,
-          )
-          : FloatingActionButton(
-            backgroundColor: Color(0xffc15123),
-            child: Icon(
-              Icons.send,
-              color: Colors.white,
-            ),
-            mini: true,
-            onPressed: _enviarMensagem,
-          ),
+              ? CupertinoButton(
+                  child: Text("Enviar"),
+                  onPressed: _enviarMensagem,
+                )
+              : FloatingActionButton(
+                  backgroundColor: Color(0xffc15123),
+                  child: Icon(
+                    Icons.send,
+                    color: Colors.white,
+                  ),
+                  mini: true,
+                  onPressed: _enviarMensagem,
+                ),
         ],
       ),
     );
@@ -316,6 +313,7 @@ class _MensagensState extends State<Mensagens> {
 
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: Theme.of(context).colorScheme.secondary,
         title: Row(
           children: <Widget>[
             CircleAvatar(
@@ -335,7 +333,7 @@ class _MensagensState extends State<Mensagens> {
         width: MediaQuery.of(context).size.width,
         decoration: BoxDecoration(
           image: DecorationImage(
-            image: AssetImage("imagens/bg.png"),
+            image: AssetImage("assets/bg.png"),
             fit: BoxFit.cover,
           ),
         ),

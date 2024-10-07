@@ -70,6 +70,23 @@ class _AbaContatosState extends State<AbaContatos> {
             );
           case ConnectionState.active:
           case ConnectionState.done:
+            if (snapshot.hasError) {
+              return Text("Erro ao carregar os dados!");
+            } else {
+              List<Usuario>? querySnapshot = snapshot.data;
+
+              if (querySnapshot?.length == 0) {
+                return Center(
+                  child: Text(
+                    "Você não tem nenhum contato ainda :( ",
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                );
+              }
+            }
             return ListView.builder(
                 itemCount: snapshot.data?.length,
                 itemBuilder: (_, indice) {
@@ -92,7 +109,7 @@ class _AbaContatosState extends State<AbaContatos> {
                             ? NetworkImage(usuario!.urlImagem!)
                             : null),
                     title: Text(
-                      usuario!.nome!,
+                      usuario?.nome ?? '',
                       style:
                           TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                     ),

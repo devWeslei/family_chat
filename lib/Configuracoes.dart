@@ -13,7 +13,6 @@ class Configuracoes extends StatefulWidget {
 }
 
 class _ConfiguracoesState extends State<Configuracoes> {
-
   TextEditingController _controllerNome = TextEditingController();
   XFile? _imagem;
   String? _idUsuarioLogado;
@@ -26,30 +25,29 @@ class _ConfiguracoesState extends State<Configuracoes> {
     XFile? imagemSelecionada;
 
     switch (origemImagem) {
-      case "camera" :
+      case "camera":
         imagemSelecionada = await _picker.pickImage(source: ImageSource.camera);
         break;
-      case "galeria" :
-        imagemSelecionada = await _picker.pickImage(source: ImageSource.gallery);
+      case "galeria":
+        imagemSelecionada =
+            await _picker.pickImage(source: ImageSource.gallery);
         break;
     }
 
     setState(() {
       _imagem = imagemSelecionada;
-      if( _imagem != null ){
+      if (_imagem != null) {
         _subindoImagem = true;
         _uploadImagem();
       }
     });
   }
 
-  Future _uploadImagem () async {
-
+  Future _uploadImagem() async {
     FirebaseStorage storage = FirebaseStorage.instance;
     Reference pastaRaiz = storage.ref();
-    Reference arquivo = pastaRaiz
-     .child("perfil")
-     .child(_idUsuarioLogado! + ".jpg");
+    Reference arquivo =
+        pastaRaiz.child("perfil").child(_idUsuarioLogado! + ".jpg");
 
     //Upload da imagem
     File file = File(_imagem!.path);
@@ -58,11 +56,11 @@ class _ConfiguracoesState extends State<Configuracoes> {
 
     //Controlar progresso do upload
     task.snapshotEvents.listen((event) {
-      if(event.state == TaskState.running){
+      if (event.state == TaskState.running) {
         setState(() {
           _subindoImagem = true;
         });
-      }else if(event.state == TaskState.success){
+      } else if (event.state == TaskState.success) {
         _subindoImagem = false;
       }
     });
@@ -75,7 +73,7 @@ class _ConfiguracoesState extends State<Configuracoes> {
 
   Future _recuperarUrlImagem(TaskSnapshot snapshot) async {
     String url = await snapshot.ref.getDownloadURL();
-    _atualizarUrlImagemFirestore( url );
+    _atualizarUrlImagemFirestore(url);
 
     setState(() {
       _urlImagemRecuperada = url;
@@ -83,53 +81,40 @@ class _ConfiguracoesState extends State<Configuracoes> {
     });
   }
 
-  _atualizarNomeFirestore(){
+  _atualizarNomeFirestore() {
     String nome = _controllerNome.text;
     FirebaseFirestore db = FirebaseFirestore.instance;
 
-    Map<String, dynamic> dadosAtualizar = {
-      "nome" : nome
-    };
+    Map<String, dynamic> dadosAtualizar = {"nome": nome};
 
-    db.collection("usuarios")
-        .doc(_idUsuarioLogado)
-        .update(dadosAtualizar);
-
+    db.collection("usuarios").doc(_idUsuarioLogado).update(dadosAtualizar);
   }
 
   //lembrando que coloquei UrlImagem com "U" maiusculo.
-  _atualizarUrlImagemFirestore( String url){
-
+  _atualizarUrlImagemFirestore(String url) {
     FirebaseFirestore db = FirebaseFirestore.instance;
 
-    Map<String, dynamic> dadosAtualizar = {
-      "UrlImagem" : url
-    };
+    Map<String, dynamic> dadosAtualizar = {"UrlImagem": url};
 
-    db.collection("usuarios")
-    .doc(_idUsuarioLogado)
-    .update(dadosAtualizar);
-
+    db.collection("usuarios").doc(_idUsuarioLogado).update(dadosAtualizar);
   }
 
   //recuperando imagem e nome de perfil
-  _recuperarDadosUsuario() async{
-
+  _recuperarDadosUsuario() async {
     FirebaseAuth auth = FirebaseAuth.instance;
-    User usuarioLogado = await  auth.currentUser!;
+    User usuarioLogado = await auth.currentUser!;
     _idUsuarioLogado = usuarioLogado.uid;
 
     FirebaseFirestore db = FirebaseFirestore.instance;
 
-    DocumentSnapshot snapshot = await db.collection("usuarios")
-      .doc(_idUsuarioLogado)
-      .get();
+    DocumentSnapshot snapshot =
+        await db.collection("usuarios").doc(_idUsuarioLogado).get();
 
     dynamic dados = snapshot.data();
 
     _controllerNome.text = dados["nome"];
 
-    if(dados["UrlImagem"] != null) {
+    if (dados["UrlImagem"] != null) {
       setState(() {
         _urlImagemRecuperada = dados["UrlImagem"];
       });
@@ -145,7 +130,9 @@ class _ConfiguracoesState extends State<Configuracoes> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("Configurações"),),
+      appBar: AppBar(
+        title: Text("Configurações"),
+      ),
       body: Container(
         padding: EdgeInsets.all(16),
         child: Center(
@@ -160,10 +147,9 @@ class _ConfiguracoesState extends State<Configuracoes> {
                 ),
                 CircleAvatar(
                   radius: 100,
-                  backgroundImage:
-                  _urlImagemRecuperada != null
-                    ? NetworkImage( _urlImagemRecuperada!)
-                    : null,
+                  backgroundImage: _urlImagemRecuperada != null
+                      ? NetworkImage(_urlImagemRecuperada!)
+                      : null,
                   backgroundColor: Colors.grey,
                 ),
                 Row(
@@ -171,15 +157,14 @@ class _ConfiguracoesState extends State<Configuracoes> {
                   children: [
                     TextButton(
                       child: Text("Câmera"),
-                      onPressed: (){
+                      onPressed: () {
                         _recuperarImagem("camera");
                       },
                     ),
                     TextButton(
                       child: Text("Galeria"),
-                      onPressed: (){
+                      onPressed: () {
                         _recuperarImagem("galeria");
-
                       },
                     ),
                   ],
@@ -230,5 +215,4 @@ class _ConfiguracoesState extends State<Configuracoes> {
       ),
     );
   }
-
 }

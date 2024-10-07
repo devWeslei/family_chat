@@ -70,16 +70,23 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: Text("Family Chat"),
+          backgroundColor: Theme.of(context).colorScheme.secondary,
+          title: Text(
+            "Family Chat",
+            style: TextStyle(
+              color: Theme.of(context).colorScheme.primary,
+            ),
+          ),
           elevation: Platform.isIOS ? 0 : 4,
           bottom: TabBar(
+            indicatorSize: TabBarIndicatorSize.tab,
             indicatorWeight: 4,
             labelStyle: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
             ),
             controller: _tabController,
-            indicatorColor: Platform.isIOS ? Colors.grey[400] : Colors.white,
+            indicatorColor: Theme.of(context).colorScheme.primary,
             tabs: [
               Tab(
                 text: "Conversas",

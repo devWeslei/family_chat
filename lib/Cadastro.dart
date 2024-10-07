@@ -13,12 +13,9 @@ class Cadastro extends StatefulWidget {
 
 class _CadastroState extends State<Cadastro> {
   //Controladores
-  TextEditingController _controllerNome =
-      TextEditingController(text: "Weslei tiago");
-  TextEditingController _controllerEmail =
-      TextEditingController(text: "weslei.t@hotmail.com");
-  TextEditingController _controllerSenha =
-      TextEditingController(text: "123456");
+  TextEditingController _controllerNome = TextEditingController();
+  TextEditingController _controllerEmail = TextEditingController();
+  TextEditingController _controllerSenha = TextEditingController();
   String _mensagemErro = "";
 
   _validarCampos() {
@@ -86,7 +83,13 @@ class _CadastroState extends State<Cadastro> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("Cadastro")),
+      appBar: AppBar(
+        title: Text(
+          "Cadastro",
+          style: TextStyle(),
+        ),
+        backgroundColor: Color(0xffd38565),
+      ),
       body: Container(
         decoration: BoxDecoration(color: Color(0xffd38565)),
         padding: EdgeInsets.all(16),
@@ -98,7 +101,7 @@ class _CadastroState extends State<Cadastro> {
                 Padding(
                   padding: EdgeInsets.only(bottom: 32),
                   child: Image.asset(
-                    "imagens/usuario.png",
+                    "assets/usuario.png",
                     width: 200,
                     height: 150,
                   ),
