@@ -1,8 +1,9 @@
 import 'dart:async';
+import 'dart:nativewrappers/_internal/vm/lib/ffi_allocation_patch.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-
+import 'package:badges/badges.dart' as badges;
 import '../RouteGenerator.dart';
 import '../model/Usuario.dart';
 
@@ -24,13 +25,6 @@ class _AbaConversasState extends State<AbaConversas> {
   void initState() {
     super.initState();
     _recuperarDadosUsuario();
-
-    // Conversa conversa = Conversa();
-    //conversa.nome = "Ana Clara";
-    // conversa.mensagem = "olá tudo bem?";
-    // conversa.caminhoFoto = "https://firebasestorage.googleapis.com/v0/b/whatsapp-74f36.appspot.com/o/perfil%2Fperfil1.jpg?alt=media&token=dec34b0b-93f4-426e-ad68-ef132e6b2047";
-
-    // _listaConversas.add(conversa);
   }
 
   Stream<QuerySnapshot>? _adicionarListenerConversas() {
@@ -118,6 +112,7 @@ class _AbaConversasState extends State<AbaConversas> {
                   String mensagem = item["mensagem"];
                   String nome = item["nome"];
                   String idDestinatario = item["idDestinatario"];
+                  int unreadCount = item["unreadCount"] ?? 0;
 
                   Usuario usuario = Usuario();
                   usuario.nome = nome;
@@ -139,11 +134,19 @@ class _AbaConversasState extends State<AbaConversas> {
                       backgroundImage:
                           urlImagem != null ? NetworkImage(urlImagem) : null,
                     ),
-                    title: Text(
-                      nome,
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16,
+                    title: badges.Badge(
+                      showBadge: unreadCount > 0,
+                      badgeContent: Text(
+                        unreadCount.toString(),
+                        style: TextStyle(fontSize: 25),
+                      ),
+                      badgeAnimation: badges.BadgeAnimation.slide(),
+                      child: Text(
+                        nome,
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
                       ),
                     ),
                     subtitle: Text(

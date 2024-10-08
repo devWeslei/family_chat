@@ -1,3 +1,4 @@
+import 'package:family_chat/telas/AbaConversas.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
@@ -81,16 +82,32 @@ class _ConfiguracoesState extends State<Configuracoes> {
     });
   }
 
-  _atualizarNomeFirestore() {
+  Future<void> _atualizarNomeFirestore() async {
     String nome = _controllerNome.text;
     FirebaseFirestore db = FirebaseFirestore.instance;
 
-    Map<String, dynamic> dadosAtualizar = {"nome": nome};
+    // Atualiza o nome no documento do usuário
+    await db
+        .collection("usuarios")
+        .doc(_idUsuarioLogado)
+        .update({"nome": nome});
 
-    db.collection("usuarios").doc(_idUsuarioLogado).update(dadosAtualizar);
+    // Atualiza o nome em todas as conversas onde o usuário é o remetente
+    QuerySnapshot conversasSnapshot = await db
+        .collection("conversas")
+        .doc(_idUsuarioLogado)
+        .collection("ultima_conversa")
+        .get();
+
+    WriteBatch batch = db.batch();
+
+    for (QueryDocumentSnapshot doc in conversasSnapshot.docs) {
+      batch.update(doc.reference, {"nomeRemetente": nome});
+    }
+
+    await batch.commit();
   }
 
-  //lembrando que coloquei UrlImagem com "U" maiusculo.
   _atualizarUrlImagemFirestore(String url) {
     FirebaseFirestore db = FirebaseFirestore.instance;
 

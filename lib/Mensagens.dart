@@ -31,7 +31,7 @@ class _MensagensState extends State<Mensagens> {
 
   final _controller = StreamController<QuerySnapshot>.broadcast();
 
-  _enviarMensagem() {
+  _enviarMensagem() async {
     String? textoMensagem = _controllerMensagem.text;
     if (textoMensagem.isNotEmpty) {
       Mensagem? mensagem = Mensagem();
@@ -48,11 +48,11 @@ class _MensagensState extends State<Mensagens> {
       _salvarMensagem(_idUsuarioDestinatario!, _idUsuarioLogado!, mensagem);
 
       //Salvar conversa
-      _salvarCoversa(mensagem);
+      await _salvarCoversa(mensagem);
     }
   }
 
-  _salvarCoversa(Mensagem msg) {
+  _salvarCoversa(Mensagem msg) async {
     //Salvar conversa remetente
     Conversa cRemetente = Conversa();
     cRemetente.idRemetente = _idUsuarioLogado;
@@ -71,6 +71,21 @@ class _MensagensState extends State<Mensagens> {
     cDestinatario.nome = _usuarioLogado.nome;
     cDestinatario.caminhoFoto = _usuarioLogado.urlImagem;
     cDestinatario.tipoMensagem = msg.tipo;
+
+    DocumentSnapshot conversaSnapshot = await db
+        .collection("conversas")
+        .doc(_idUsuarioDestinatario)
+        .collection("ultima_conversa")
+        .doc(_idUsuarioLogado)
+        .get();
+
+    if (conversaSnapshot.exists) {
+      int unreadCount = conversaSnapshot.get('unreadCount') ?? 0;
+      cDestinatario.unreadCount = unreadCount + 1;
+    } else {
+      cDestinatario.unreadCount = 1;
+    }
+
     cDestinatario.salvar();
   }
 
@@ -165,6 +180,36 @@ class _MensagensState extends State<Mensagens> {
     });
   }
 
+  Future<void> zerararContadorMensagensNaoLidas(
+      String idRemetente, String idDestinatario) async {
+    FirebaseFirestore db = FirebaseFirestore.instance;
+    DocumentReference docRef = db
+        .collection("conversas")
+        .doc(idRemetente)
+        .collection("ultima_conversa")
+        .doc(idDestinatario);
+
+    try {
+      // Verifica se o documento existe
+      DocumentSnapshot docSnapshot = await docRef.get();
+
+      if (docSnapshot.exists) {
+        // Se o documento existe, atualizamos o unreadCount
+        await docRef.update({"unreadCount": 0});
+      }
+    } catch (e) {
+      print("Erro ao zerar contador de mensagens não lidas: $e");
+    }
+  }
+
+  Future<bool> _onWillPop() async {
+    if (_idUsuarioLogado != null && widget.contato.idUsuario != null) {
+      await zerararContadorMensagensNaoLidas(
+          _idUsuarioLogado!, widget.contato.idUsuario!);
+    }
+    return true; // Permite que o pop ocorra após zerar o contador
+  }
+
   Stream<QuerySnapshot>? _adicionarListenerMensagens() {
     final stream = db
         .collection("mensagens")
@@ -183,10 +228,18 @@ class _MensagensState extends State<Mensagens> {
     return null;
   }
 
+  Future<void> _inicializarDados() async {
+    await _recuperarDadosUsuario();
+    if (_idUsuarioLogado != null) {
+      await zerararContadorMensagensNaoLidas(
+          _idUsuarioLogado!, widget.contato.idUsuario!);
+    }
+  }
+
   @override
   void initState() {
     super.initState();
-    _recuperarDadosUsuario();
+    _inicializarDados();
   }
 
   @override
@@ -311,40 +364,51 @@ class _MensagensState extends State<Mensagens> {
       },
     );
 
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.secondary,
-        title: Row(
-          children: <Widget>[
-            CircleAvatar(
-                maxRadius: 20,
-                backgroundColor: Colors.grey,
-                backgroundImage: widget.contato.urlImagem != null
-                    ? NetworkImage(widget.contato.urlImagem!)
-                    : null),
-            Padding(
-              padding: EdgeInsets.only(left: 8),
-              child: Text(widget.contato.nome ?? "sem nome"),
-            )
-          ],
-        ),
-      ),
-      body: Container(
-        width: MediaQuery.of(context).size.width,
-        decoration: BoxDecoration(
-          image: DecorationImage(
-            image: AssetImage("assets/bg.png"),
-            fit: BoxFit.cover,
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (bool didPop, dynamic result) async {
+        if (didPop) return;
+
+        final shouldPop = await _onWillPop();
+        if (shouldPop && context.mounted) {
+          Navigator.of(context).pop(true);
+        }
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          backgroundColor: Theme.of(context).colorScheme.secondary,
+          title: Row(
+            children: <Widget>[
+              CircleAvatar(
+                  maxRadius: 20,
+                  backgroundColor: Colors.grey,
+                  backgroundImage: widget.contato.urlImagem != null
+                      ? NetworkImage(widget.contato.urlImagem!)
+                      : null),
+              Padding(
+                padding: EdgeInsets.only(left: 8),
+                child: Text(widget.contato.nome ?? "sem nome"),
+              )
+            ],
           ),
         ),
-        child: SafeArea(
-          child: Container(
-            padding: EdgeInsets.all(8),
-            child: Column(
-              children: [
-                stream,
-                caixaMensagem,
-              ],
+        body: Container(
+          width: MediaQuery.of(context).size.width,
+          decoration: BoxDecoration(
+            image: DecorationImage(
+              image: AssetImage("assets/bg.png"),
+              fit: BoxFit.cover,
+            ),
+          ),
+          child: SafeArea(
+            child: Container(
+              padding: EdgeInsets.all(8),
+              child: Column(
+                children: [
+                  stream,
+                  caixaMensagem,
+                ],
+              ),
             ),
           ),
         ),
