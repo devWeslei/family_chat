@@ -55,7 +55,6 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
         _deslogarUsuario();
         break;
     }
-    // print("Item escolhido: " + itemEscolhido);
   }
 
   _deslogarUsuario() async {

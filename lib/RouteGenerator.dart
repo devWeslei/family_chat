@@ -17,10 +17,6 @@ class RouteGenerator {
     final args = settings.arguments;
 
     switch (settings.name) {
-      // case "/" :
-      //   return MaterialPageRoute(
-      //       builder: (_) => Login()
-      //   );
       case ROTA_LOGIN:
         return MaterialPageRoute(builder: (_) => Login());
       case ROTA_CADASTRO:

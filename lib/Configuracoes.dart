@@ -1,4 +1,3 @@
-import 'package:family_chat/telas/AbaConversas.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
@@ -192,9 +191,6 @@ class _ConfiguracoesState extends State<Configuracoes> {
                     controller: _controllerNome,
                     keyboardType: TextInputType.text,
                     style: TextStyle(fontSize: 20),
-                    // onChanged: (texto){
-                    //   _atualizarNomeFirestore(texto);
-                    // },
                     decoration: InputDecoration(
                       contentPadding: EdgeInsets.fromLTRB(32, 16, 32, 16),
                       hintText: "Nome",
